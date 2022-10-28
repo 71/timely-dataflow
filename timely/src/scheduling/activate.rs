@@ -5,10 +5,11 @@ use std::sync::Arc;
 use std::cell::RefCell;
 use std::thread::Thread;
 use std::collections::BinaryHeap;
-use std::time::{Duration, Instant};
 use std::cmp::Reverse;
 use crossbeam_channel::{Sender, Receiver};
 use futures_util::task::ArcWake;
+
+use crate::{Duration, Instant};
 
 /// Methods required to act as a timely scheduler.
 ///

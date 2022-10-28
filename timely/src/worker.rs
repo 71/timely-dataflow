@@ -4,7 +4,6 @@ use std::rc::Rc;
 use std::cell::{RefCell, RefMut};
 use std::any::Any;
 use std::str::FromStr;
-use std::time::{Instant, Duration};
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 use std::sync::Arc;
@@ -17,6 +16,7 @@ use crate::progress::SubgraphBuilder;
 use crate::progress::operate::Operate;
 use crate::dataflow::scopes::Child;
 use crate::logging::TimelyLogger;
+use crate::{Duration, Instant};
 
 /// Different ways in which timely's progress tracking can work.
 ///

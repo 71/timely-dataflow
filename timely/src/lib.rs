@@ -67,6 +67,13 @@ extern crate timely_communication;
 extern crate timely_bytes;
 extern crate timely_logging;
 
+pub(crate) use std::time::Duration;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) use std::time::Instant;
+#[cfg(target_arch = "wasm32")]
+pub(crate) use instant::Instant;
+
 pub use execute::{execute, execute_directly, example};
 #[cfg(feature = "getopts")]
 pub use execute::execute_from_args;

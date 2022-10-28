@@ -3,8 +3,14 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::any::Any;
 use std::collections::HashMap;
-use std::time::{Instant, Duration};
 use std::fmt::{self, Debug};
+
+use std::time::Duration;
+
+#[cfg(not(target_arch = "wasm32"))]
+use std::time::Instant;
+#[cfg(target_arch = "wasm32")]
+use instant::Instant;
 
 pub struct Registry<Id> {
     /// A worker-specific identifier.
