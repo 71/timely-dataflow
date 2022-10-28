@@ -1,0 +1,15 @@
+[package]
+name = "wasm-example"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+timely = { git = "https://github.com/TimelyDataflow/timely-dataflow", default-features = false }
+differential-dataflow = { git = "https://github.com/TimelyDataflow/differential-dataflow", default-features = false }
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+cmd_lib = "1.3"

@@ -6,7 +6,8 @@ members = [
     "kafkaesque",
     "logging",
     "timely",
-    "experiments"
+    "experiments",
+    "wasm-example",
 ]
 
 [profile.release]
@@ -16,3 +17,6 @@ rpath = false
 # Disable LTO because it causes erratic behavior in Rust 1.53
 #lto = true
 debug-assertions = false
+
+[patch.'https://github.com/TimelyDataflow/timely-dataflow']
+timely = { path = "./timely" }

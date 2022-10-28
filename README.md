@@ -1,3 +1,81 @@
+# `wasm32-unknown-unknown` support
+
+In `Cargo.toml`:
+
+```toml
+[dependencies]
+timely = { git = "https://github.com/TimelyDataflow/timely-dataflow", default-features = false }
+differential-dataflow = { git = "https://github.com/TimelyDataflow/differential-dataflow", default-features = false }
+
+[patch.'https://github.com/TimelyDataflow/timely-dataflow']
+timely = { path = "https://github.com/71/timely-dataflow" }
+```
+
+This replaces `Instant::now()` in the `Worker` constructor by a [`wasm32` shim](https://github.com/sebcrozet/instant),
+allowing a dataflow to be created. For example:
+
+```rust
+use differential_dataflow::input::InputSession;
+use differential_dataflow::operators::{Join, Consolidate};
+use wasm_bindgen::JsValue;
+use wasm_bindgen::prelude::wasm_bindgen;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(value: wasm_bindgen::JsValue);
+}
+
+#[wasm_bindgen]
+pub fn run(size: usize) -> Result<(), JsValue> {
+    // define a new timely dataflow computation.
+    timely::execute_directly(move |worker| {
+
+        // create an input collection of data.
+        let mut input = InputSession::new();
+
+        // define a new computation.
+        worker.dataflow(|scope| {
+
+            // create a new collection from our input.
+            let manages = input.to_collection(scope);
+
+            // if (m2, m1) and (m1, p), then output (m1, (m2, p))
+            manages
+                .map(|(m2, m1)| (m1, m2))
+                .join(&manages)
+                .consolidate()
+                .inspect(|x| log(format!("{x:?}").into()));
+        });
+
+        // Load input (a binary tree).
+        input.advance_to(0);
+
+        for person in 0..size {
+            input.insert((person / 2, person));
+        }
+
+        for person in 1..size {
+            input.advance_to(person);
+            input.remove((person / 2, person));
+            input.insert((person / 3, person));
+        }
+    });
+
+    Ok(())
+}
+```
+
+Run with:
+
+```bash
+$ cargo build --release --target wasm32-unknown-unknown
+$ wasm-bindgen target/wasm32-unknown-unknown/release/example.wasm --out-dir wasm --reference-types --target deno
+$ deno eval "import { run } from './wasm/example.js'; run(10);"
+```
+
+See [`wasm-example`](wasm-example/src/lib.rs) for an up-to-date example.
+
 # Timely Dataflow #
 
 Timely dataflow is a low-latency cyclic dataflow computational model, introduced in the paper [Naiad: a timely dataflow system](http://dl.acm.org/citation.cfm?id=2522738). This project is an extended and more modular implementation of timely dataflow in Rust.
